@@ -251,7 +251,7 @@ python check_rules.py tricky
    git push
    ```
 3. Repository shared with GitHub user: **`mjsekol`**.
-4. **My commit link:** `https://github.com/BaconFace288/AIAroundMe/commit/f65ae0ea50d74eb3c70d32e0f983d3ebc5a9fc21`
+4. **My commit link:** `https://github.com/BaconFace288/SpamFilter/commit/3249f574ec665f024722dc39a62094e0ea39873b`
 
 ---
 
