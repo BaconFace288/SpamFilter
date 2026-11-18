@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Assignment 3: Build a Spam Filter With Rules - MCCTC 145130</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: #1a1a1a;
+      max-width: 880px;
+      margin: 40px auto;
+      padding: 0 25px;
+    }
+    h1, h2, h3 {
+      color: #111827;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 6px;
+    }
+    .header-box {
+      background: #f3f4f6;
+      border-left: 4px solid #2563eb;
+      padding: 14px 18px;
+      margin-bottom: 25px;
+      border-radius: 4px;
+    }
+    .score-banner {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      color: #065f46;
+      font-weight: bold;
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin: 15px 0;
+      font-size: 1.05em;
+    }
+    .answer-box {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-left: 4px solid #0ea5e9;
+      padding: 14px 16px;
+      margin: 14px 0 20px 0;
+      border-radius: 4px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      font-size: 0.95em;
+    }
+    th, td {
+      border: 1px solid #d1d5db;
+      padding: 9px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background: #f9fafb;
+      font-weight: 600;
+    }
+    tr:nth-child(even) td {
+      background: #fbfcfd;
+    }
+    code {
+      background: #f1f5f9;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-family: Consolas, monospace;
+      font-size: 0.9em;
+      color: #0f172a;
+    }
+    pre {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 14px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-family: Consolas, monospace;
+      font-size: 0.9em;
+    }
+    pre code {
+      background: none;
+      color: inherit;
+      padding: 0;
+    }
+    img.screenshot {
+      max-width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      margin: 12px 0 20px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-box">
+    <div style="font-size: 0.9em; color: #4b5563; font-weight: bold;">MCCTC | 145130 Applications of AI</div>
+    <h1 style="border: none; margin: 4px 0 8px 0; padding: 0;">Assignment 3: Build a Spam Filter With Rules</h1>
+    <div><strong>Points:</strong> 40 points · Wednesday and Thursday &nbsp;|&nbsp; <strong>Date:</strong> November 18, 2026</div>
+  </div>
+
+  <p><em>Why you are doing this: every phone has a spam filter. Before you can understand how AI catches spam next week, you are going to build a spam filter the old way, with rules you write yourself. Then you will watch it break.</em></p>
+
+  <h2>Part 1 · Wednesday: Build the filter (24 points)</h2>
+
+  <h3>Step 2: Run the starter and read the score</h3>
+  <div class="answer-box">
+    <strong>Question (2 points): A filter that says not spam for every message got 25 out of 40. Is that a good spam filter? Why or why not?</strong><br><br>
+    <strong>No, it is not a good spam filter.</strong> Even though 25 out of 40 (62.5%) sounds like more than half right, this score is an illusion caused by class imbalance: 25 of the 40 test messages happened to be legitimate normal texts. The baseline filter missed 100% of the actual spam (0 out of 15 caught, 15 missed spam). A spam filter whose sole purpose is to protect an inbox from unwanted or malicious messages is completely useless if it lets every single spam message through.
+  </div>
+
+  <h3>Step 4: Rule Progression Table (8 points)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 70px; text-align: center;">Rule #</th>
+        <th>The word or phrase</th>
+        <th style="width: 140px;">Score after adding it</th>
+        <th>Spam Message Caught</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="text-align: center;"><strong>1</strong></td>
+        <td><code>winner</code></td>
+        <td><strong>26 out of 40</strong></td>
+        <td>"You are a WINNER claim your cash prize today before it expires"</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;"><strong>2</strong></td>
+        <td><code>claim</code></td>
+        <td><strong>29 out of 40</strong></td>
+        <td>Catches 3 messages: "selected to win a free gift card claim now", "shopping spree reply WIN to claim", "free vacation claim your prize"</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;"><strong>3</strong></td>
+        <td><code>urgent</code></td>
+        <td><strong>31 out of 40</strong></td>
+        <td>Catches 2 messages: "URGENT your account has been locked...", "URGENT you owe a toll payment..."</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;"><strong>4</strong></td>
+        <td><code>click</code></td>
+        <td><strong>35 out of 40</strong></td>
+        <td>Catches 4 messages: "package could not be delivered click here", "500 dollars a day... click to learn more", "click to unlock your discount", "gaming credits... click here"</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;"><strong>5</strong></td>
+        <td><code>prize</code></td>
+        <td><strong>36 out of 40</strong></td>
+        <td>"Congratulations your number was selected in our weekly prize draw"</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;"><strong>6</strong></td>
+        <td><code>free</code></td>
+        <td><strong>38 out of 40</strong></td>
+        <td>Catches 2 messages: "FREE iPhone for the first 100...", "buy one get three free"</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Step 5: Watch for false alarms (4 points)</h3>
+  <div class="answer-box">
+    <strong>Question (4 points): Which message became a false alarm, and why did your rule catch it? Then delete the won rule, or change it so it no longer causes the false alarm. Explain what you did.</strong><br><br>
+    <strong>1. Which message and why:</strong> The legitimate message <code>we won the game 42 to 38</code> became a false alarm when testing <code>if "won" in text: return True</code>. The rule looked for the bare substring "won" anywhere in the message. While "won" appears in lottery scams, here it was used naturally in a real-world conversation celebrating a high school sports victory.<br><br>
+    <strong>2. What I did:</strong> I removed the bare "won" rule. The spam message containing "won" (<em>"You have won a 1000 dollar shopping spree reply WIN to claim"</em>) was already caught cleanly by the rule <code>if "claim" in text: return True</code>, so removing "won" eliminated the false alarm while maintaining a 100% spam catch rate.
+  </div>
+
+  <h3>Step 6: Reach 35 or more (10 points)</h3>
+  <div class="score-banner">✓ Final Score on messages.csv: 40 out of 40 (0 False Alarms, 0 Missed Spam)</div>
+  <p><strong>Finished <code>is_spam</code> function:</strong></p>
+<pre><code>def is_spam(message):
+    """Return True if the message is spam. Return False if it is not."""
+    text = message.lower()
+
+    # Step 8 Exception rules (run first to prevent false alarms)
+    if "free throw" in text:
+        return False
+    if "class chat" in text:
+        return False
+
+    # Spam detection rules
+    if "winner" in text:
+        return True
+    if "claim" in text:
+        return True
+    if "urgent" in text:
+        return True
+    if "click" in text:
+        return True
+    if "prize" in text:
+        return True
+    if "free" in text:
+        return True
+    if "warranty" in text:
+        return True
+    if "account" in text:
+        return True
+
+    return False</code></pre>
+
+  <p><strong>Selected spam message & exact rule:</strong></p>
+  <ul>
+    <li><strong>Message:</strong> <code>Final notice your car warranty is about to expire call now</code></li>
+    <li><strong>Rule that caught it:</strong> <code>if "warranty" in text: return True</code> (Line 38 in <code>spam_rules.py</code>).</li>
+  </ul>
+
+  <h2>Part 2 · Thursday: Break the filter (16 points)</h2>
+
+  <h3>Step 7: Run the tricky test (4 points)</h3>
+  <div class="answer-box">
+    <strong>1. Score on tricky_messages.csv:</strong> <strong>1 out of 10</strong> (prior to exception rules)<br>
+    <strong>2. Missed spam (5):</strong> e.g., <code>hey is this still your number i have something for you</code><br>
+    <strong>3. False alarms (4):</strong> e.g., <code>free throw practice is after school in the big gym</code> (falsely caught by "free") and <code>click the link in the class chat for the study guide</code> (falsely caught by "click").
+  </div>
+
+  <h3>Step 8: Try to fix it (4 points)</h3>
+  <div class="answer-box">
+    <strong>Question: What two fixes did you try? Did they work? Did either fix break anything in the original 40 messages?</strong><br><br>
+    <strong>1. Fix 1:</strong> Added <code>if "free throw" in text: return False</code> before spam rules. This worked immediately to whitelist basketball practice texts without blocking actual "free" prize scams.<br>
+    <strong>2. Fix 2:</strong> Added <code>if "class chat" in text: return False</code> before spam rules. This allowed students to share study guide links in school group chats without being flagged by the "click" rule.<br><br>
+    <strong>Did either fix break the original 40 messages?</strong> No. Running <code>python check_rules.py</code> confirmed the original score remained a perfect <strong>40 out of 40</strong>.
+  </div>
+
+  <h3>Step 9: Think about it (8 points, 2 each)</h3>
+  <div class="answer-box">
+    <ol>
+      <li><strong>You fixed two messages. Tomorrow, scammers send a new message with different words. Would your filter catch it? Why or why not?</strong><br>
+      No, the filter would not catch it. A rule-based filter only evaluates exact substring matches hardcoded by the programmer. If scammers modify their vocabulary (e.g., writing "reward" instead of "prize", or "follow link" instead of "click"), the filter has no understanding of context, intent, or fraud, so the new scam will bypass the rules completely.</li><br>
+      <li><strong>A missed spam and a false alarm are both mistakes. Which one is worse for a person using your filter? Explain.</strong><br>
+      A <strong>false alarm</strong> is far worse. If a spam message is missed, the user experiences minor annoyance and deletes it in one second. But if a legitimate message is falsely marked as spam, the user might miss a critical communication—such as a job interview offer, an urgent medical update, a note from a teacher, or an emergency text from family—causing significant real-world harm.</li><br>
+      <li><strong>How many rules do you think you would need to catch every spam text ever sent? Is that possible?</strong><br>
+      You would need hundreds of thousands or millions of rules, and it is <strong>fundamentally impossible</strong>. Human language is virtually infinite, and scammers constantly invent new slang, misspellings, and evasive techniques (like leetspeak or character substitutions). A human programmer writing manual <code>if</code> statements can never anticipate or keep up with every possible variation.</li><br>
+      <li><strong>Instead of writing rules, what if you gave a computer 10,000 messages already marked spam or not spam, and let it find the patterns itself? What do you think it would do better? What might it do worse?</strong><br>
+      <em>What it would do better:</em> An AI machine learning model calculates statistical weights across word combinations, phrase frequencies, and message structures simultaneously. It can detect subtle patterns that humans overlook and generalizes much better to new or rephrased spam messages without needing brittle keyword lists.<br>
+      <em>What it might do worse:</em> The model operates as a statistical "black box," making it hard to explain the exact reason for an individual decision. Furthermore, if the 10,000 training messages are outdated, biased, or missing certain styles of conversation, the model can make unexpected prediction errors on edge cases it never encountered during training.</li>
+    </ol>
+  </div>
+
+  <h2>What you turn in</h2>
+
+  <h3>1. Terminal Screenshots</h3>
+  <p><strong>Screenshot 1: Final score on <code>messages.csv</code> (40 out of 40)</strong></p>
+  <img class="screenshot" src="./screenshot1_check_rules.png" alt="Screenshot 1: 40 out of 40 on messages.csv">
+
+  <p><strong>Screenshot 2: Tricky test score on <code>tricky_messages.csv</code></strong></p>
+  <img class="screenshot" src="./screenshot2_check_rules_tricky.png" alt="Screenshot 2: Tricky test on tricky_messages.csv">
+
+  <h3>2. Review Questions</h3>
+  <div class="answer-box">
+    <strong>1. Why did a filter that scored well on the class messages do badly on the tricky ones?</strong><br>
+    The filter performed well on the class messages because the rules were overfitted to the specific vocabulary found in <code>messages.csv</code>. When applied to <code>tricky_messages.csv</code>, it encountered conversational scams with zero traditional trigger words (causing missed spam) and normal texts that used trigger words like "free" and "click" in benign contexts (causing false alarms).<br><br>
+    <strong>2. What is the difference between a missed spam and a false alarm?</strong><br>
+    A <strong>missed spam</strong> (false negative) occurs when a spam message is erroneously classified as normal and allowed into the user's inbox. A <strong>false alarm</strong> (false positive) occurs when a legitimate, normal text message is erroneously classified as spam and blocked.
+  </div>
+
+  <h3>3. GitHub Commit Information</h3>
+  <div class="answer-box">
+    <strong>Commit message:</strong> <code>Week 1 Assignment 3: spam filter with rules</code><br>
+    <strong>Shared with:</strong> <code>mjsekol</code><br>
+    <strong>My commit link:</strong> <a href="https://github.com/BaconFace288/AIAroundMe/commit/f65ae0ea50d74eb3c70d32e0f983d3ebc5a9fc21" target="_blank">https://github.com/BaconFace288/AIAroundMe/commit/f65ae0ea50d74eb3c70d32e0f983d3ebc5a9fc21</a>
+  </div>
+
+</body>
+</html>
